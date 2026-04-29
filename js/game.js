@@ -650,6 +650,15 @@ const Game = (() => {
     // Portal (passa players para detecção de sons de entrada)
     state.portal.update(dt, [state.light, state.heavy]);
 
+    // Mecânica Final: Luxar "libera" Tenebre ao chegar no centro (Apenas no Mobile)
+    if (data.isFinal && state.activePlayer === 'light' && typeof MobileControls !== 'undefined' && MobileControls.isMobile()) {
+      const portalRect = { x: state.portal.x, y: state.portal.y, w: state.portal.w, h: state.portal.h };
+      if (Physics.overlaps(state.light, portalRect)) {
+        state.activePlayer = 'heavy';
+        if (state.light.say) state.light.say("Sua vez... eu te espero.", 2.5);
+      }
+    }
+
     // Ativa o portal quando todos os cristais forem coletados
     // (Fases sem cristais abrem o portal automaticamente)
     if (!state.portal.active) {
