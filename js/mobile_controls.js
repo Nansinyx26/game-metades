@@ -25,6 +25,34 @@ const MobileControls = (() => {
     injectCSS();
     injectDOM();
     setupListeners();
+    setupVisibilityObserver();
+  }
+
+  function setupVisibilityObserver() {
+    // Lista de telas onde os controles devem ser visíveis
+    const allowedScreens = ['screen-game', 'screen-narrative', 'screen-pause', 'screen-level-win', 'screen-ending'];
+    
+    const updateVisibility = () => {
+      const activeScreen = document.querySelector('.screen.active');
+      const id = activeScreen ? activeScreen.id : '';
+      if (allowedScreens.includes(id)) {
+        document.body.classList.add('show-controls');
+      } else {
+        document.body.classList.remove('show-controls');
+      }
+    };
+
+    // Observa mudanças de classe em qualquer elemento .screen
+    const observer = new MutationObserver((mutations) => {
+      updateVisibility();
+    });
+
+    document.querySelectorAll('.screen').forEach(screen => {
+      observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    // Executa uma vez no início
+    updateVisibility();
   }
 
   function injectCSS() {
@@ -50,13 +78,18 @@ const MobileControls = (() => {
         width: 100vw;
         height: 90px;
         background: linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.40) 65%, transparent 100%);
-        display: flex;
+        display: none; /* Escondido por padrão */
         align-items: flex-end;
         justify-content: space-between;
         padding: 0 14px 10px;
         box-sizing: border-box;
         z-index: 9999;
         pointer-events: none;
+      }
+
+      /* Só aparece quando a classe show-controls está no body */
+      body.is-mobile.show-controls #mobile-controls {
+        display: flex;
       }
 
       .mc-side {
@@ -240,11 +273,11 @@ const MobileControls = (() => {
         const t = touches[i];
         // Aumentamos a "sensibilidade" checando não só o ponto exato, 
         // mas também uma pequena margem ao redor (8px)
-        const el = getButtonAtPoint(t.clientX, t.clientY) || 
-                   getButtonAtPoint(t.clientX + 8, t.clientY) || 
-                   getButtonAtPoint(t.clientX - 8, t.clientY) ||
-                   getButtonAtPoint(t.clientX, t.clientY + 8) ||
-                   getButtonAtPoint(t.clientX, t.clientY - 8);
+        const el = getButtonAtPoint(t.clientX, t.clientY) ||
+          getButtonAtPoint(t.clientX + 8, t.clientY) ||
+          getButtonAtPoint(t.clientX - 8, t.clientY) ||
+          getButtonAtPoint(t.clientX, t.clientY + 8) ||
+          getButtonAtPoint(t.clientX, t.clientY - 8);
 
         if (el) {
           const action = el.getAttribute('data-btn');
@@ -259,7 +292,7 @@ const MobileControls = (() => {
 
     container.addEventListener('touchstart', (e) => {
       if (navigator.vibrate) navigator.vibrate(8);
-      
+
       // Ativamos o sinal de pause apenas UMA VEZ no início do toque.
       // O Input.js irá ler virtual.pause e depois limpá-lo com consume().
       for (let i = 0; i < e.changedTouches.length; i++) {
@@ -273,7 +306,7 @@ const MobileControls = (() => {
           break;
         }
       }
-      
+
       updateVirtualState(e.touches);
     });
     container.addEventListener('touchmove', (e) => updateVirtualState(e.touches));
