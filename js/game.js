@@ -1039,6 +1039,7 @@ const Game = (() => {
   return {
     start, pause, resume, restart,
     nextLevel, nextNarrative, testLastLevel,
+    state,
     _getCurrentLevelIdx: () => state.currentLevel
   };
 })();

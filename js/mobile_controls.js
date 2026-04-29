@@ -245,9 +245,15 @@ const MobileControls = (() => {
         const t = e.changedTouches[i];
         const el = getButtonAtPoint(t.clientX, t.clientY);
         if (el && el.getAttribute('data-btn') === 'pause') {
-          virtual.pause = true;
+          if (typeof Game !== 'undefined') {
+            // Toggle direto de pause/resume
+            if (Game.state && Game.state.paused) {
+              Game.resume();
+            } else {
+              Game.pause();
+            }
+          }
           el.classList.add('active');
-          // Removemos a classe active após um curto tempo para o feedback visual de clique
           setTimeout(() => el.classList.remove('active'), 150);
           break;
         }
