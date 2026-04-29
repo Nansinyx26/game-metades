@@ -224,7 +224,7 @@ const Game = (() => {
       w: 24 * SCALER, h: 32 * SCALER,
       type: 'light',
       speed: 600, // Aumentado (era 380)
-      jumpForce: 1000,
+      jumpForce: 1150, // Aumentado de 1000 para facilitar no mobile
       gravityScale: 0.65,
       mass: 2,
       maxJumps: 2, // Luxar pode dar salto duplo

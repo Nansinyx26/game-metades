@@ -225,8 +225,10 @@ const MobileControls = (() => {
       for (let i = 0; i < touches.length; i++) {
         const t = touches[i];
         const el = getButtonAtPoint(t.clientX, t.clientY) || 
-                   getButtonAtPoint(t.clientX + 10, t.clientY) || 
-                   getButtonAtPoint(t.clientX - 10, t.clientY);
+                   getButtonAtPoint(t.clientX + 15, t.clientY) || 
+                   getButtonAtPoint(t.clientX - 15, t.clientY) ||
+                   getButtonAtPoint(t.clientX, t.clientY + 15) ||
+                   getButtonAtPoint(t.clientX, t.clientY - 15);
 
         if (el) {
           const rawBtn = el.getAttribute('data-btn');
