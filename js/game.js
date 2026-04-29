@@ -104,6 +104,7 @@ const Game = (() => {
   function start() {
     console.log('[Game] Botão Continuar/Start pressionado.');
     try {
+      if (typeof GlobalState !== 'undefined') GlobalState.reset();
       if (typeof Achievements !== 'undefined') Achievements.clearRun();
       state.currentLevel = 0;
       state.currentAct = 1; // Ajustado para 1 (Despertar)
