@@ -67,7 +67,7 @@ const MobileControls = (() => {
       body.is-mobile #gameCanvas {
         height: calc(100vh - 90px) !important;
         width: 100vw;
-        object-fit: contain;
+        object-fit: fill; /* Preenche as laterais para ocupar toda a largura do celular */
       }
 
       /* Barra fixa na base, flutua SEM cobrir o jogo */
