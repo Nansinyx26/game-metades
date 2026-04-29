@@ -31,13 +31,13 @@ const MobileControls = (() => {
     const style = document.createElement('style');
     style.textContent = `
       body.is-mobile #screen-game {
-        /* Garante que o jogo fique acima da barra de controles */
-        padding-bottom: 110px !important;
+        /* Reduzido para 90px para dar mais espaço ao jogo */
+        padding-bottom: 90px !important;
         align-items: center;
         justify-content: flex-start;
       }
       body.is-mobile #gameCanvas {
-        height: calc(100vh - 110px) !important;
+        height: calc(100vh - 90px) !important;
         width: 100vw;
         object-fit: contain;
       }
@@ -48,7 +48,7 @@ const MobileControls = (() => {
         bottom: 0;
         left: 0;
         width: 100vw;
-        height: 110px;
+        height: 90px;
         background: linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.40) 65%, transparent 100%);
         display: flex;
         align-items: flex-end;
@@ -69,8 +69,8 @@ const MobileControls = (() => {
       /* D-pad: cima centralizado, esq/dir na linha de baixo */
       .mc-dpad {
         display: grid;
-        grid-template-columns: repeat(3, 44px);
-        grid-template-rows: repeat(2, 44px);
+        grid-template-columns: repeat(3, 50px);
+        grid-template-rows: repeat(2, 45px);
         grid-template-areas:
           ". up ."
           "lf .  rt";
@@ -97,8 +97,8 @@ const MobileControls = (() => {
 
       /* Base dos botões */
       .mc-btn {
-        width: 44px;
-        height: 44px;
+        width: 56px;
+        height: 56px;
         border-radius: 50%;
         border: 1.5px solid rgba(255,255,255,0.22);
         background: rgba(0,0,0,0.30);
@@ -139,9 +139,9 @@ const MobileControls = (() => {
 
       /* Botão de ação extra (dash / slam) */
       .mc-btn.extra-btn {
-        width: 52px;
-        height: 52px;
-        font-size: 1.25rem;
+        width: 64px;
+        height: 64px;
+        font-size: 1.4rem;
       }
 
       /* Pause */
@@ -238,7 +238,14 @@ const MobileControls = (() => {
 
       for (let i = 0; i < touches.length; i++) {
         const t = touches[i];
-        const el = getButtonAtPoint(t.clientX, t.clientY);
+        // Aumentamos a "sensibilidade" checando não só o ponto exato, 
+        // mas também uma pequena margem ao redor (8px)
+        const el = getButtonAtPoint(t.clientX, t.clientY) || 
+                   getButtonAtPoint(t.clientX + 8, t.clientY) || 
+                   getButtonAtPoint(t.clientX - 8, t.clientY) ||
+                   getButtonAtPoint(t.clientX, t.clientY + 8) ||
+                   getButtonAtPoint(t.clientX, t.clientY - 8);
+
         if (el) {
           const action = el.getAttribute('data-btn');
           // Ignoramos o pause aqui para evitar o loop de toggle infinito enquanto o dedo está parado
