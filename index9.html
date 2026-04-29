@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Metades — Um Jogo de Reencontro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Lato:wght@300;400&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- TELA INICIAL -->
+  <div id="screen-menu" class="screen active">
+    <div class="menu-bg">
+      <div class="orb orb-light"></div>
+      <div class="orb orb-heavy"></div>
+    </div>
+    <div class="menu-content">
+      <h1 class="title">Metades</h1>
+      <p class="subtitle">Um jogo de reencontro</p>
+      <div class="menu-buttons">
+        <button class="btn-main" onclick="Game.testLevel9()">Jogar (Fase 9)</button>
+        <button class="btn-main btn-secondary" onclick="Screen.show('screen-controls')">Controles</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA DE CONTROLES -->
+  <div id="screen-controls" class="screen">
+    <div class="panel">
+      <h2>Controles</h2>
+      <div class="controls-grid">
+        <div class="control-card light">
+          <div class="char-icon light-icon">◈</div>
+          <h3>Metade Leve</h3>
+          <p><kbd>A</kbd><kbd>D</kbd> — Mover</p>
+          <p><kbd>W</kbd> — Pular</p>
+          <p>Pula alto · Move rápido</p>
+        </div>
+        <div class="control-card heavy">
+          <div class="char-icon heavy-icon">◆</div>
+          <h3>Metade Pesada</h3>
+          <p><kbd>←</kbd><kbd>→</kbd> — Mover</p>
+          <p><kbd>↑</kbd> — Pular</p>
+          <p>Empurra caixas · Ativa botões</p>
+        </div>
+      </div>
+      <p class="hint">Dica: <kbd>TAB</kbd> também alterna entre os personagens</p>
+      <button class="btn-main" onclick="Screen.show('screen-menu')">Voltar</button>
+    </div>
+  </div>
+
+  <!-- TELA DE NARRATIVA -->
+  <div id="screen-narrative" class="screen">
+    <div class="narrative-box">
+      <p id="narrative-text" class="narrative-text"></p>
+      <button class="btn-narrative" onclick="Game.nextNarrative()">Continuar ›</button>
+    </div>
+  </div>
+
+  <!-- TELA DE JOGO -->
+  <div id="screen-game" class="screen">
+    <div id="hud">
+      <div class="hud-left">
+        <span id="hud-act">Ato 1</span>
+        <span id="hud-level">Fase 1</span>
+      </div>
+      <div class="hud-center">
+        <div class="hud-char" id="hud-light">
+          <span class="hud-icon">◈</span> Leve
+        </div>
+        <div class="hud-char" id="hud-heavy">
+          <span class="hud-icon">◆</span> Pesada
+        </div>
+      </div>
+      <div class="hud-right">
+        <button class="btn-hud" onclick="Game.pause()">❚❚</button>
+      </div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <!-- TELA DE PAUSA -->
+  <div id="screen-pause" class="screen">
+    <div class="panel">
+      <h2>Pausado</h2>
+      <button class="btn-main" onclick="Game.resume()">Continuar</button>
+      <button class="btn-main btn-secondary" onclick="Game.restart()">Reiniciar Fase</button>
+      <button class="btn-main btn-secondary" onclick="Screen.show('screen-menu')">Menu</button>
+    </div>
+  </div>
+
+  <!-- TELA DE VITÓRIA DE FASE -->
+  <div id="screen-level-win" class="screen">
+    <div class="panel">
+      <div class="win-icon">✦</div>
+      <h2 id="win-title">Fase Completa!</h2>
+      <p id="win-msg"></p>
+      <button class="btn-main" onclick="Game.nextLevel()">Próxima Fase →</button>
+    </div>
+  </div>
+
+  <!-- TELA FINAL -->
+  <div id="screen-ending" class="screen">
+    <div class="ending-bg">
+      <div class="orb orb-merged"></div>
+    </div>
+    <div class="ending-content">
+      <p class="ending-quote">"Não somos metade…</p>
+      <p class="ending-quote ending-quote2">somos reencontro."</p>
+      <button class="btn-main" style="margin-top:3rem" onclick="Screen.show('screen-menu')">Jogar Novamente</button>
+    </div>
+  </div>
+
+  <!-- Scripts em ordem de dependência -->
+  <script src="js/audio.js"></script>
+  <script src="js/screen.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/game.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Two To One — O Reconhecimento</title>
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- TELA DE INTRODUÇÃO -->
+  <div id="screen-intro" class="screen">
+    <video id="intro-video" class="intro-video">
+      <source src="video/video_intro_introducao.mp4" type="video/mp4">
+      Seu navegador não suporta vídeos.
+    </video>
+    <div id="intro-start-overlay" class="intro-overlay">
+      <button class="btn-main" onclick="VideoIntro.start()">Despertar</button>
+    </div>
+    <button class="btn-skip" id="btn-skip-intro" onclick="VideoIntro.skip()">Omitir ❯</button>
+  </div>
+
+  <!-- TELA INICIAL -->
+  <div id="screen-menu" class="screen">
+    <div class="menu-bg">
+      <div class="orb orb-light"></div>
+      <div class="orb orb-heavy"></div>
+    </div>
+    <div class="menu-content">
+      <h1 class="title">Two To One</h1>
+      <p class="subtitle">O que sempre fomos</p>
+      <div class="menu-buttons">
+        <button class="btn-main" onclick="Game.start()">Continuar</button>
+        <button class="btn-main btn-secondary" onclick="Screen.show('screen-controls')">Memórias</button>
+        <button class="btn-main btn-secondary" onclick="Screen.show('screen-settings')">Ajustes</button>
+        <button class="btn-main btn-secondary"
+          style="background-color: #662288; border-color: #aa55dd; margin-top: 10px;"
+          onclick="Game.testLastLevel()">Testar Última Fase</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TELA DE CONTROLES -->
+  <div id="screen-controls" class="screen">
+    <div class="panel">
+      <h2>Fragmentos de Movimento</h2>
+      <div class="controls-grid">
+        <div class="control-card light">
+          <div class="char-icon light-icon">◈</div>
+          <h3>Luxar (Luz)</h3>
+          <p><kbd>A</kbd><kbd>D</kbd> — Flutuar</p>
+          <p><kbd>W</kbd> — Ascender</p>
+          <p><kbd>Shift</kbd> — Dash (Investida)</p>
+          <p>Ativa o que está oculto.</p>
+        </div>
+        <div class="control-card heavy">
+          <div class="char-icon heavy-icon">◆</div>
+          <h3>Tenebre (Sombra)</h3>
+          <p><kbd>←</kbd><kbd>→</kbd> — Caminhar</p>
+          <p><kbd>↑</kbd> — Saltar</p>
+          <p><kbd>↓</kbd> — Slam (Impacto)</p>
+          <p>Move o que é pesado.</p>
+        </div>
+      </div>
+      <p class="hint">A conexão é mútua: o que um faz, o outro sente.</p>
+      <button class="btn-main" onclick="Screen.show('screen-menu')">Retornar</button>
+      <div class="achievements-section">
+        <h2 style="margin-top: 1rem;">Conquistas</h2>
+        <div id="achievements-list" class="achievements-grid"></div>
+      </div>
+    </div>
+  </div>
+  <!-- TELA DE CONFIGURAÇÕES -->
+  <div id="screen-settings" class="screen">
+    <div class="panel">
+      <h2>Ajustes</h2>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <label>Música</label>
+          <input type="range" id="volume-music" min="0" max="1" step="0.1" value="0.5"
+            onchange="Settings.setMusicVolume(this.value)">
+        </div>
+        <div class="setting-item">
+          <label>Efeitos</label>
+          <input type="range" id="volume-fx" min="0" max="1" step="0.1" value="0.7"
+            onchange="Settings.setFXVolume(this.value)">
+        </div>
+        <div class="setting-item">
+          <label>Luzes e Bloom</label>
+          <input type="checkbox" id="gfx-lighting" checked onchange="Settings.setLighting(this.checked)">
+        </div>
+      </div>
+      <button class="btn-main" onclick="Screen.show('screen-menu')">Retornar</button>
+    </div>
+  </div>
+
+  <!-- TELA DE NARRATIVA -->
+  <div id="screen-narrative" class="screen">
+    <div class="narrative-box">
+      <p id="narrative-text" class="narrative-text"></p>
+      <button class="btn-narrative" onclick="Game.nextNarrative()">Seguir ›</button>
+    </div>
+  </div>
+
+  <!-- TELA DE JOGO -->
+  <div id="screen-game" class="screen">
+    <div id="hud">
+      <div id="hud-level"></div>
+      <div id="hud-act" style="display:none"></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+  </div>
+
+  <!-- TELA DE PAUSA -->
+  <div id="screen-pause" class="screen">
+    <div class="panel">
+      <h2>Silêncio</h2>
+      <button class="btn-main" onclick="Game.resume()">Retomar</button>
+      <button class="btn-main btn-secondary" onclick="Game.restart()">Recomeçar</button>
+      <button class="btn-main btn-secondary" onclick="Screen.show('screen-menu')">Menu</button>
+    </div>
+  </div>
+
+  <!-- TELA DE VITÓRIA DE FASE -->
+  <div id="screen-level-win" class="screen">
+    <div class="panel">
+      <div class="win-icon">✦</div>
+      <h2 id="win-title">Harmonia Reestabelecida</h2>
+      <p id="win-msg"></p>
+      <button class="btn-main" onclick="Game.nextLevel()">Avançar →</button>
+    </div>
+  </div>
+
+  <!-- TELA FINAL -->
+  <div id="screen-ending" class="screen">
+    <div class="ending-bg">
+      <div class="orb orb-merged"></div>
+    </div>
+    <div class="ending-content">
+      <p class="ending-quote">"Não éramos incompletos…"</p>
+      <p class="ending-quote ending-quote2">"Apenas separados."</p>
+      <button class="btn-main" style="margin-top:3rem" onclick="Screen.show('screen-menu')">A Unidade</button>
+    </div>
+  </div>
+
+  <!-- Scripts em ordem de dependência -->
+  <script src="js/audio.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/dialogues.js"></script>
+  <script src="js/achievements.js"></script>
+  <script src="js/screen.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/entities.js"></script>
+  <script src="js/levels.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/input.js"></script>
+  <script src="js/video_intro.js"></script>
+  <script src="js/mobile_controls.js"></script>
+  <script src="js/game.js"></script>
+</body>
+
+</html>

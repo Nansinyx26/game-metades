@@ -1,0 +1,179 @@
+// === LEVELS ===
+// Definição das fases de Two To One
+// Coordenadas em tiles (1 tile = 32px). Convertidas pelo Game.
+
+const TILE = 32;
+
+const LEVELS = [
+  // ─────────────────────────────────────────�  {
+    id: 0,
+    act: 1, actName: 'Ato 1 — Luxar (Despertar)',
+    name: 'O Eco da Luz',
+    activeChar: 'light',
+    tiles: [
+      [0, 18, 30, 2], // Chão base
+      [0, 0, 2, 20],  // Parede esq
+      [28, 0, 2, 20], // Parede dir
+      [2, 14, 6, 1],  [20, 12, 6, 1], [4, 8, 8, 1], [18, 6, 8, 1],
+    ],
+    players: {
+      light: { col: 4, row: 16 },
+      heavy: { col: 0, row: 0 },
+    },
+    crystals: [
+      { id: 'c1', col: 5, row: 13 },
+      { id: 'c2', col: 22, row: 11 },
+      { id: 'c3', col: 20, row: 5 },
+    ],
+    portal: { col: 4, row: 6 },
+    goalText: 'Alcançar a saída no topo. Ative os cristais de luz para revelar o caminho.',
+  },
+
+  // ─────────────────────────────────────────────
+  // TENEBRE 1 — "Atravessando o Abismo"
+  // ─────────────────────────────────────────────
+  {
+    id: 1,
+    act: 2, actName: 'Ato 2 — Tenebre (Esquecimento)',
+    name: 'Atravessando o Abismo',
+    activeChar: 'heavy',
+    tiles: [
+      [0, 14, 6, 6],   // Início
+      [24, 14, 6, 6],  // Fim
+    ],
+    players: {
+      light: { col: 0, row: 0 },
+      heavy: { col: 2, row: 12 },
+    },
+    echoPlatforms: [
+      { id: 'e1', col: 8, row: 14, linkedCrystalId: 'c1' },
+      { id: 'e2', col: 14, row: 14, linkedCrystalId: 'c2' },
+      { id: 'e3', col: 20, row: 14, linkedCrystalId: 'c3' },
+    ],
+    portal: { col: 27, row: 12 },
+    goalText: 'O caminho que ela iluminou agora sustenta seus passos.',
+  },
+
+  // ─────────────────────────────────────────────
+  // TENEBRE 2 — "Peso do Passado"
+  // ─────────────────────────────────────────────
+  {
+    id: 2,
+    act: 2, actName: 'Ato 2 — Tenebre (Esquecimento)',
+    name: 'Peso do Passado',
+    activeChar: 'heavy',
+    tiles: [
+      [0, 18, 30, 2],
+      [0, 0, 2, 18], [28, 0, 2, 18],
+      [2, 10, 10, 1], // Plataforma da caixa
+    ],
+    players: {
+      light: { col: 0, row: 0 },
+      heavy: { col: 4, row: 16 },
+    },
+    boxes: [
+      { id: 'box_past', col: 4, row: 8 },
+    ],
+    buttons: [
+      { col: 20, row: 18, linkedId: 'gate1', lockOnPress: true },
+    ],
+    platforms: [
+      { id: 'gate1', col: 28, row: 14, w: 2, h: 4, endCol: 28, endRow: 20, speed: 50, elevatorMode: true },
+    ],
+    portal: { col: 24, row: 5 },
+    goalText: 'Abra o portão. Deixe sua marca onde ela possa encontrar.',
+  },
+
+  // ─────────────────────────────────────────────
+  // LUXAR 2 — "O Apoio Silencioso"
+  // ─────────────────────────────────────────────
+  {
+    id: 3,
+    act: 1, actName: 'Ato 1 — Luxar (Busca)',
+    name: 'O Apoio Silencioso',
+    activeChar: 'light',
+    tiles: [
+      [0, 18, 30, 2],
+      [0, 0, 2, 18], [28, 0, 2, 18],
+      [14, 0, 2, 14], // Parede divisória alta
+    ],
+    players: {
+      light: { col: 4, row: 16 },
+      heavy: { col: 0, row: 0 },
+    },
+    boxes: [
+      { id: 'box_past', col: 4, row: 16 }, // Posição será sobrescrita pelo GlobalState
+    ],
+    portal: { col: 24, row: 16 },
+    goalText: 'Suba a parede. O que ele moveu no silêncio, ajuda você no despertar.',
+  },
+
+  // ─────────────────────────────────────────────
+  // UNUM — "O Reconhecimento"
+  // ─────────────────────────────────────────────
+  {
+    id: 4,
+    act: 3, actName: 'Ato 3 — Unum (União)',
+    name: 'O Reconhecimento',
+    isFinal: true,
+    tiles: [
+      [0, 18, 12, 2], 
+      [18, 18, 12, 2],
+      [0, 0, 2, 18], [28, 0, 2, 18],
+    ],
+    players: {
+      light: { col: 2, row: 16 },
+      heavy: { col: 26, row: 16 },
+    },
+    portal: { col: 14, row: 16 },
+    goalText: 'Não éramos incompletos… apenas separados.',
+  },
+];
+
+const ACT_NARRATIVES = {
+  1: [
+    "E se o mundo como conhecemos fosse apenas uma parte da verdade?",
+    "Houve um tempo em que não existia separação. Éramos um.",
+    "Até que fomos divididos… e esquecemos partes de nós mesmos.",
+    "Uma parte que busca… mesmo sem lembrar o que perdeu."
+  ],
+  2: [
+    "A luz se distancia.",
+    "O mundo se torna instável… fragmentado… difícil de reconhecer.",
+    "Uma parte esquecida… que aprendeu a existir sozinha.",
+    "Pesada. Silenciosa. Persistente. E, ainda assim… conectada."
+  ],
+  3: [
+    "No limite da distância… algo responde.",
+    "Não como lembrança. Mas como reconhecimento.",
+    "Duas existências. Dois caminhos. Um mesmo eco.",
+    "Pela primeira vez… não há busca. Apenas encontro."
+  ],
+};
+─────────────
+  // UNUM — "O Reconhecimento"
+  // ─────────────────────────────────────────────
+  {
+    id: 4,
+    act: 3, actName: 'Ato 3 — Unum (União)',
+    name: 'O Reconhecimento',
+    isFinal: true,
+    tiles: [
+      [0, 18, 12, 2], 
+      [18, 18, 12, 2],
+      [0, 0, 2, 18], [28, 0, 2, 18],
+    ],
+    players: {
+      light: { col: 2, row: 16 },
+      heavy: { col: 26, row: 16 },
+    },
+    portal: { col: 14, row: 16 },
+    goalText: 'Encontrem-se no centro. Não éramos incompletos… apenas separados.',
+  },
+];
+
+const ACT_NARRATIVES = {
+  1: ['"O mundo era um antes da divisão."', '"Eu sinto um vazio…"', '"…mas algo me move."'],
+  2: ['"A existência é densa."', '"Eu não busco."', '"…eu apenas transformo."'],
+  3: ['"O reconhecimento."', '"Não fomos transformados."', '"…apenas revelados."'],
+};
