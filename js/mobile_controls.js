@@ -25,23 +25,23 @@ const MobileControls = (() => {
     injectCSS();
     injectDOM();
     setupListeners();
-    setupVisibilityObserver();
+    setupVisibilityPolling();
   }
 
-  function setupVisibilityObserver() {
-    // Lista de telas onde os controles devem ser visíveis
+  function setupVisibilityPolling() {
     const allowedScreens = ['screen-game', 'screen-narrative', 'screen-pause', 'screen-level-win', 'screen-ending'];
     
-    const updateVisibility = () => {
+    // Polling de 100ms é mais robusto para jogos do que MutationObserver
+    setInterval(() => {
       const activeScreen = document.querySelector('.screen.active');
       const id = activeScreen ? activeScreen.id : '';
       
       // Atualiza classe do personagem ativo no body
-      if (typeof Game !== 'undefined') {
+      if (typeof Game !== 'undefined' && Game.state) {
         if (Game.state.activePlayer === 'light') {
           document.body.classList.add('player-light');
           document.body.classList.remove('player-heavy');
-        } else {
+        } else if (Game.state.activePlayer === 'heavy') {
           document.body.classList.add('player-heavy');
           document.body.classList.remove('player-light');
         }
@@ -52,19 +52,7 @@ const MobileControls = (() => {
       } else {
         document.body.classList.remove('show-controls');
       }
-    };
-
-    // Observa mudanças de classe em qualquer elemento .screen
-    const observer = new MutationObserver((mutations) => {
-      updateVisibility();
-    });
-
-    document.querySelectorAll('.screen').forEach(screen => {
-      observer.observe(screen, { attributes: true, attributeFilter: ['class'] });
-    });
-
-    // Executa uma vez no início
-    updateVisibility();
+    }, 100);
   }
 
   function injectCSS() {
@@ -220,7 +208,7 @@ const MobileControls = (() => {
       });
 
       // Determina prefixo baseado no jogador ativo
-      const prefix = (typeof Game !== 'undefined' && Game.state.activePlayer === 'heavy') ? 'heavy' : 'light';
+      const prefix = (typeof Game !== 'undefined' && Game.state && Game.state.activePlayer === 'heavy') ? 'heavy' : 'light';
 
       for (let i = 0; i < touches.length; i++) {
         const t = touches[i];
