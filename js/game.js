@@ -205,7 +205,7 @@ const Game = (() => {
     state.lastJumpLight = false;
     state.lastJumpHeavy = false;
     state.tabWasDown = false;
-    state.activePlayer = 'light';
+    state.activePlayer = data.activeChar || 'light';
 
     const SCALER = 2; // Faz o mundo ter 30x2x32=1920px de largura, preenchendo a tela
     const cols = 30 * SCALER, rows = 19 * SCALER;
