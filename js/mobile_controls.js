@@ -132,12 +132,16 @@ const MobileControls = (() => {
       .mc-btn.action-btn { width: 70px; height: 70px; }
       
       .mc-btn.pause-btn {
-        width: 44px; height: 32px;
+        width: 60px; height: 45px;
         border-radius: 8px;
-        font-size: 0.8rem;
-        background: rgba(255,255,255,0.1);
-        border-color: rgba(255,255,255,0.3);
+        font-size: 1.1rem;
+        background: rgba(255,255,255,0.15);
+        border-color: rgba(255,255,255,0.35);
         color: #fff;
+        pointer-events: all;
+      }
+      .mc-center {
+        pointer-events: all;
       }
 
       /* Ícone do poder muda dinamicamente via JS ou classe */
