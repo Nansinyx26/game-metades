@@ -35,6 +35,18 @@ const MobileControls = (() => {
     const updateVisibility = () => {
       const activeScreen = document.querySelector('.screen.active');
       const id = activeScreen ? activeScreen.id : '';
+      
+      // Atualiza classe do personagem ativo no body
+      if (typeof Game !== 'undefined') {
+        if (Game.state.activePlayer === 'light') {
+          document.body.classList.add('player-light');
+          document.body.classList.remove('player-heavy');
+        } else {
+          document.body.classList.add('player-heavy');
+          document.body.classList.remove('player-light');
+        }
+      }
+
       if (allowedScreens.includes(id)) {
         document.body.classList.add('show-controls');
       } else {
@@ -58,8 +70,18 @@ const MobileControls = (() => {
   function injectCSS() {
     const style = document.createElement('style');
     style.textContent = `
+      :root {
+        --mc-color: rgba(90, 158, 255, 0.65);
+        --mc-bg: rgba(50, 110, 220, 0.25);
+        --mc-border: rgba(140, 195, 255, 0.5);
+      }
+      body.player-heavy {
+        --mc-color: rgba(200, 168, 92, 0.7);
+        --mc-bg: rgba(140, 100, 20, 0.25);
+        --mc-border: rgba(240, 210, 120, 0.5);
+      }
+
       body.is-mobile #screen-game {
-        /* Reduzido para 90px para dar mais espaço ao jogo */
         padding-bottom: 90px !important;
         align-items: center;
         justify-content: flex-start;
@@ -67,138 +89,78 @@ const MobileControls = (() => {
       body.is-mobile #gameCanvas {
         height: calc(100vh - 90px) !important;
         width: 100vw;
-        object-fit: fill; /* Preenche as laterais para ocupar toda a largura do celular */
+        object-fit: fill;
       }
 
-      /* Barra fixa na base, flutua SEM cobrir o jogo */
       #mobile-controls {
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100vw;
-        height: 90px;
-        background: linear-gradient(to top, rgba(0,0,0,0.80) 0%, rgba(0,0,0,0.40) 65%, transparent 100%);
-        display: none; /* Escondido por padrão */
-        align-items: flex-end;
+        height: 100px;
+        background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+        display: none;
         justify-content: space-between;
-        padding: 0 14px 10px;
+        align-items: center;
+        padding: 0 20px 10px;
         box-sizing: border-box;
         z-index: 9999;
         pointer-events: none;
       }
-
-      /* Só aparece quando a classe show-controls está no body */
-      body.is-mobile.show-controls #mobile-controls {
-        display: flex;
-      }
+      body.is-mobile.show-controls #mobile-controls { display: flex; }
 
       .mc-side {
         display: flex;
-        align-items: flex-end;
-        gap: 6px;
+        align-items: center;
+        gap: 15px;
         pointer-events: all;
       }
 
-      /* D-pad: cima centralizado, esq/dir na linha de baixo */
-      .mc-dpad {
-        display: grid;
-        grid-template-columns: repeat(3, 50px);
-        grid-template-rows: repeat(2, 45px);
-        grid-template-areas:
-          ". up ."
-          "lf .  rt";
-        gap: 3px;
-      }
-      [data-btn="lightLeft"],
-      [data-btn="heavyLeft"]  { grid-area: lf; }
-      [data-btn="lightRight"],
-      [data-btn="heavyRight"] { grid-area: rt; }
-      [data-btn="lightJump"],
-      [data-btn="heavyJump"]  { grid-area: up; }
-
-      .mc-extra {
-        display: flex;
-        align-items: flex-end;
-      }
-
-      .mc-center {
-        display: flex;
-        align-items: flex-end;
-        padding-bottom: 10px;
-        pointer-events: all;
-      }
-
-      /* Base dos botões */
       .mc-btn {
-        width: 56px;
-        height: 56px;
+        width: 65px;
+        height: 65px;
         border-radius: 50%;
-        border: 1.5px solid rgba(255,255,255,0.22);
-        background: rgba(0,0,0,0.30);
-        color: rgba(255,255,255,0.85);
-        font-size: 1.05rem;
+        border: 2px solid var(--mc-border);
+        background: var(--mc-bg);
+        color: var(--mc-color);
+        font-size: 1.8rem;
         display: flex;
         align-items: center;
         justify-content: center;
         user-select: none;
         touch-action: none;
         -webkit-tap-highlight-color: transparent;
-        transition: background 0.07s, transform 0.07s;
-        cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        transition: all 0.1s;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      }
+      .mc-btn.active {
+        background: var(--mc-color);
+        color: #fff;
+        transform: scale(0.92);
+        box-shadow: 0 0 15px var(--mc-color);
       }
 
-      /* Luxar — azul */
-      .mc-btn.light-btn {
-        background: rgba(50, 110, 220, 0.30);
-        border-color: rgba(90, 158, 255, 0.50);
-      }
-      .mc-btn.light-btn.active {
-        background: rgba(90, 158, 255, 0.65);
-        transform: scale(0.91);
-        border-color: rgba(140, 195, 255, 0.80);
-      }
-
-      /* Tenebre — dourado */
-      .mc-btn.heavy-btn {
-        background: rgba(140, 100, 20, 0.30);
-        border-color: rgba(200, 168, 92, 0.50);
-      }
-      .mc-btn.heavy-btn.active {
-        background: rgba(200, 168, 92, 0.65);
-        transform: scale(0.91);
-        border-color: rgba(240, 210, 120, 0.80);
-      }
-
-      /* Botão de ação extra (dash / slam) */
-      .mc-btn.extra-btn {
-        width: 64px;
-        height: 64px;
-        font-size: 1.4rem;
-      }
-
-      /* Pause */
+      .mc-btn.jump-btn { width: 80px; height: 80px; font-size: 2.2rem; }
+      .mc-btn.action-btn { width: 70px; height: 70px; }
+      
       .mc-btn.pause-btn {
-        width: 36px;
-        height: 24px;
-        border-radius: 7px;
-        font-size: 0.65rem;
-        background: rgba(255,255,255,0.10);
-        border-color: rgba(255,255,255,0.28);
-      }
-      .mc-btn.pause-btn.active {
-        background: rgba(255,255,255,0.30);
+        width: 44px; height: 32px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        background: rgba(255,255,255,0.1);
+        border-color: rgba(255,255,255,0.3);
+        color: #fff;
       }
 
-      /* Landscape estreito */
-      @media (orientation: landscape) and (max-height: 460px) {
-        body.is-mobile #screen-game { padding-bottom: 80px !important; }
-        body.is-mobile #gameCanvas { height: calc(100vh - 80px) !important; }
-        #mobile-controls   { height: 80px; padding: 0 10px 6px; }
-        .mc-btn            { width: 38px; height: 38px; font-size: 0.9rem; }
-        .mc-btn.extra-btn  { width: 44px; height: 44px; font-size: 1.1rem; }
-        .mc-dpad           { grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(2, 38px); gap: 2px; }
-        .mc-side           { gap: 4px; }
+      /* Ícone do poder muda dinamicamente via JS ou classe */
+      .power-icon::after { content: "⚡"; }
+      body.player-heavy .power-icon::after { content: "💥"; }
+
+      @media (orientation: landscape) and (max-height: 500px) {
+        #mobile-controls { height: 85px; padding-bottom: 5px; }
+        .mc-btn { width: 55px; height: 55px; font-size: 1.5rem; }
+        .mc-btn.jump-btn { width: 65px; height: 65px; }
+        .mc-btn.action-btn { width: 60px; height: 60px; }
       }
     `;
     document.head.appendChild(style);
@@ -208,33 +170,21 @@ const MobileControls = (() => {
     const container = document.createElement('div');
     container.id = 'mobile-controls';
     container.innerHTML = `
-      <!-- Luxar (esquerda) -->
+      <!-- LADO ESQUERDO: PULAR -->
       <div class="mc-side">
-        <div class="mc-dpad">
-          <div class="mc-btn light-btn" data-btn="lightLeft">&#9664;</div>
-          <div class="mc-btn light-btn" data-btn="lightJump">&#9650;</div>
-          <div class="mc-btn light-btn" data-btn="lightRight">&#9654;</div>
-        </div>
-        <div class="mc-extra">
-          <div class="mc-btn light-btn extra-btn" data-btn="lightDash">&#9889;</div>
-        </div>
+        <div class="mc-btn jump-btn" data-btn="unifiedJump">&#9650;</div>
       </div>
 
-      <!-- Pause (centro) -->
+      <!-- CENTRO: PAUSE -->
       <div class="mc-center">
         <div class="mc-btn pause-btn" data-btn="pause">&#9646;&#9646;</div>
       </div>
 
-      <!-- Tenebre (direita) -->
+      <!-- LADO DIREITO: MOVER + AÇÃO -->
       <div class="mc-side">
-        <div class="mc-extra">
-          <div class="mc-btn heavy-btn extra-btn" data-btn="heavySlam">&#128165;</div>
-        </div>
-        <div class="mc-dpad">
-          <div class="mc-btn heavy-btn" data-btn="heavyLeft">&#9664;</div>
-          <div class="mc-btn heavy-btn" data-btn="heavyJump">&#9650;</div>
-          <div class="mc-btn heavy-btn" data-btn="heavyRight">&#9654;</div>
-        </div>
+        <div class="mc-btn" data-btn="unifiedLeft">&#9664;</div>
+        <div class="mc-btn" data-btn="unifiedRight">&#9654;</div>
+        <div class="mc-btn action-btn power-icon" data-btn="unifiedAction"></div>
       </div>
     `;
 
@@ -261,7 +211,7 @@ const MobileControls = (() => {
     }
 
     function updateVirtualState(touches) {
-      // Reseta apenas as teclas de movimento/ação (não o pause)
+      // Reseta todos os estados virtuais (exceto pause)
       for (const key in virtual) {
         if (key !== 'pause') virtual[key] = false;
       }
@@ -269,20 +219,26 @@ const MobileControls = (() => {
         if (b.getAttribute('data-btn') !== 'pause') b.classList.remove('active');
       });
 
+      // Determina prefixo baseado no jogador ativo
+      const prefix = (typeof Game !== 'undefined' && Game.state.activePlayer === 'heavy') ? 'heavy' : 'light';
+
       for (let i = 0; i < touches.length; i++) {
         const t = touches[i];
-        // Aumentamos a "sensibilidade" checando não só o ponto exato, 
-        // mas também uma pequena margem ao redor (8px)
-        const el = getButtonAtPoint(t.clientX, t.clientY) ||
-          getButtonAtPoint(t.clientX + 8, t.clientY) ||
-          getButtonAtPoint(t.clientX - 8, t.clientY) ||
-          getButtonAtPoint(t.clientX, t.clientY + 8) ||
-          getButtonAtPoint(t.clientX, t.clientY - 8);
+        const el = getButtonAtPoint(t.clientX, t.clientY) || 
+                   getButtonAtPoint(t.clientX + 10, t.clientY) || 
+                   getButtonAtPoint(t.clientX - 10, t.clientY);
 
         if (el) {
-          const action = el.getAttribute('data-btn');
-          // Ignoramos o pause aqui para evitar o loop de toggle infinito enquanto o dedo está parado
-          if (action && action in virtual && action !== 'pause') {
+          const rawBtn = el.getAttribute('data-btn');
+          let action = null;
+
+          // Mapeamento unificado
+          if (rawBtn === 'unifiedJump') action = prefix + 'Jump';
+          if (rawBtn === 'unifiedLeft') action = prefix + 'Left';
+          if (rawBtn === 'unifiedRight') action = prefix + 'Right';
+          if (rawBtn === 'unifiedAction') action = (prefix === 'light') ? 'lightDash' : 'heavySlam';
+
+          if (action && action in virtual) {
             virtual[action] = true;
             el.classList.add('active');
           }
