@@ -236,36 +236,44 @@ const MobileControls = (() => {
       }
     }
 
-    container.addEventListener('touchstart', (e) => {
-      if (navigator.vibrate) navigator.vibrate(8);
-
-      // Ativamos o sinal de pause apenas UMA VEZ no início do toque.
-      // O Input.js irá ler virtual.pause e depois limpá-lo com consume().
-      for (let i = 0; i < e.changedTouches.length; i++) {
-        const t = e.changedTouches[i];
-        const el = getButtonAtPoint(t.clientX, t.clientY);
-        if (el && el.getAttribute('data-btn') === 'pause') {
-          if (typeof Game !== 'undefined') {
-            // Toggle direto de pause/resume
-            if (Game.state && Game.state.paused) {
-              Game.resume();
-            } else {
-              Game.pause();
-            }
-          }
-          el.classList.add('active');
-          setTimeout(() => el.classList.remove('active'), 150);
-          break;
+    // Listener específico e direto para o PAUSE (muito mais confiável)
+    const pauseBtn = container.querySelector('.pause-btn');
+    if (pauseBtn) {
+      pauseBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (navigator.vibrate) navigator.vibrate(8);
+        if (typeof Game !== 'undefined') {
+          if (Game.state && Game.state.paused) Game.resume();
+          else Game.pause();
         }
-      }
+        pauseBtn.classList.add('active');
+        setTimeout(() => pauseBtn.classList.remove('active'), 150);
+      }, { passive: false });
+    }
 
+    container.addEventListener('touchstart', (e) => {
+      // Ignora se for toque no botão de pause (já tratado acima)
+      const touch = e.changedTouches[0];
+      const el = getButtonAtPoint(touch.clientX, touch.clientY);
+      if (el && el.classList.contains('pause-btn')) return;
+
+      if (navigator.vibrate) navigator.vibrate(8);
       updateVirtualState(e.touches);
-    });
-    container.addEventListener('touchmove', (e) => updateVirtualState(e.touches));
+    }, { passive: false });
+
+    container.addEventListener('touchmove', (e) => {
+      e.preventDefault(); // Evita scroll/zoom durante o jogo
+      updateVirtualState(e.touches);
+    }, { passive: false });
+
     container.addEventListener('touchend', (e) => {
       updateVirtualState(e.touches);
-    });
-    container.addEventListener('touchcancel', (e) => updateVirtualState(e.touches));
+    }, { passive: false });
+
+    container.addEventListener('touchcancel', (e) => {
+      updateVirtualState(e.touches);
+    }, { passive: false });
   }
 
   // Mantido para compatibilidade com input.js
